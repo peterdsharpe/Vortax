@@ -1,0 +1,18 @@
+# Fluidity
+*.pyspy
+*.obj
+*.stl
+*.vtu
+*.vtk
+*.vtp
+
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv*
