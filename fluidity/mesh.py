@@ -45,7 +45,7 @@ class Mesh(eqx.Module):
 
     @property
     def face_normals(self) -> Float[vec3, "n_faces"]:
-        cross = self.cross(
+        cross = jnp.cross(
             self.vertices[self.faces[:, 1]] - self.vertices[self.faces[:, 0]],
             self.vertices[self.faces[:, 2]] - self.vertices[self.faces[:, 1]],
         )
@@ -53,15 +53,17 @@ class Mesh(eqx.Module):
 
     @property
     def face_areas(self) -> Float[Array, "n_faces"]:
-        cross = self.cross(
+        cross = jnp.cross(
             self.vertices[self.faces[:, 1]] - self.vertices[self.faces[:, 0]],
             self.vertices[self.faces[:, 2]] - self.vertices[self.faces[:, 1]],
         )
         return jnp.linalg.norm(cross, axis=-1) / 2
 
-    @staticmethod
-    def cross(a: Float[vec3, "n_vertices"], b: Float[vec3, "n_vertices"]) -> Float[vec3, "n_vertices"]:
-        return jnp.cross(a, b)
+    @property
+    def bounds(self) -> Float[Array, "3 2"]:
+        mins = jnp.min(self.vertices, axis=0)
+        maxs = jnp.max(self.vertices, axis=0)
+        return jnp.stack([mins, maxs], axis=-1)
 
     @classmethod
     def from_pyvista(cls, mesh: pv.PolyData) -> "Mesh":
