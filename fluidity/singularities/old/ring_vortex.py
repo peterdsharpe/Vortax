@@ -7,6 +7,7 @@ from fluidity.singularities.utils import smoothed_inv
 
 eps = 1e-8
 
+
 @jax.jit
 def induced_velocity_vortex_filament(
     query_point: vec3,
@@ -49,6 +50,7 @@ def induced_velocity_vortex_filament(
 
     return constant * strength
 
+
 @jax.jit
 def induced_velocity_ring_vortex(
     query_point: vec3,
@@ -66,8 +68,10 @@ def induced_velocity_ring_vortex(
     Returns:
         Induced velocity vector at query point
     """
-    n_ring_points = ring_points.shape[0]  # Dynamically get the number of points from the jaxtyping annotation
-    
+    n_ring_points = ring_points.shape[
+        0
+    ]  # Dynamically get the number of points from the jaxtyping annotation
+
     # Vectorized computation for all segments
     def compute_segment_velocity(i):
         start_point = ring_points[i]
@@ -76,9 +80,9 @@ def induced_velocity_ring_vortex(
             query_point=query_point,
             start_point=start_point,
             end_point=end_point,
-            radius=radius
+            radius=radius,
         )
-    
+
     # Map the computation over all segments and sum the results
     velocities = jax.vmap(compute_segment_velocity)(jnp.arange(n_ring_points))
     return jnp.sum(velocities, axis=0)
@@ -134,12 +138,14 @@ if __name__ == "__main__":
     print("\nTest case 4: Ring vortex")
 
     # Define the vertices of a panel in the xz-plane
-    vertices = jnp.array([
-        [1.0, 1.0, 0.0],
-        [-1.0, 1.0, 0.0],
-        [-1.0, -1.0, 0.0],
-        [1.0, -1.0, 0.0],
-    ])
+    vertices = jnp.array(
+        [
+            [1.0, 1.0, 0.0],
+            [-1.0, 1.0, 0.0],
+            [-1.0, -1.0, 0.0],
+            [1.0, -1.0, 0.0],
+        ]
+    )
 
     # Define a query point above the panel
     query_point = jnp.array([0.0, 0.0, 1.0])
@@ -167,5 +173,5 @@ if __name__ == "__main__":
         ring_points=vertices,
         radius=eps,
     )
-    
+
     print(f"{np.array(v_total_ring) = }, magnitude: {jnp.linalg.norm(v_total_ring) = }")
