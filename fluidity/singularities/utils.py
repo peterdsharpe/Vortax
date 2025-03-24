@@ -1,4 +1,5 @@
 import jax.numpy as jnp
+import jaxtyping
 
 
 def smoothed_inv(x: float, radius: float) -> float:
@@ -15,4 +16,4 @@ def smoothed_inv(x: float, radius: float) -> float:
     Returns:
         Smoothed inverse distance value
     """
-    return jnp.where(radius > 0.0, x / (x**2 + radius**2), 1.0 / x)
+    return x / (x**2 + radius**2)
