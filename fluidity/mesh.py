@@ -67,7 +67,10 @@ class Mesh(eqx.Module):
 
     @classmethod
     def from_pyvista(cls, mesh: pv.PolyData) -> "Mesh":
-        return cls(vertices=jnp.array(mesh.points), faces=jnp.unique(mesh.regular_faces, axis=0))
+        return cls(
+            vertices=jnp.array(mesh.points),
+            faces=jnp.unique(mesh.regular_faces, axis=0),
+        )
 
     def to_pyvista(self) -> pv.PolyData:
         return pv.PolyData.from_regular_faces(
