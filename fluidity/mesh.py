@@ -8,6 +8,7 @@ from fluidity.singularities.ring_vortex import induced_velocity_ring_vortex
 from fluidity.singularities.utils import smoothed_inv
 from fluidity.types import vec3
 import pyvista as pv
+import trimesh
 
 
 class Mesh(eqx.Module):
@@ -70,6 +71,11 @@ class Mesh(eqx.Module):
         return pv.PolyData.from_regular_faces(
             np.array(self.vertices), np.array(self.faces)
         )
+
+    @classmethod
+    def from_trimesh(cls, mesh: trimesh.Trimesh) -> "Mesh":
+        return cls(vertices=jnp.array(mesh.vertices), faces=jnp.array(mesh.faces))
+
 
 if __name__ == "__main__":
     import pyvista as pv
