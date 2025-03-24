@@ -7,7 +7,6 @@ import jax.numpy as jnp
 import equinox as eqx
 
 
-@eqx.filter_jit
 def get_induced_velocity_ring_vortex(
     ring_points: Float[vec3, "n_ring_points"],
     query_point: vec3,
@@ -40,7 +39,6 @@ def get_induced_velocity_ring_vortex(
     return result * vortex_strength / (4.0 * jnp.pi)
 
 
-@eqx.filter_jit
 def get_induced_velocity_mesh_ring_vortices(
     mesh: Mesh,
     query_point: vec3,
