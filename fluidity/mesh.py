@@ -4,7 +4,6 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 from jaxtyping import Float, Int, Array
-from fluidity.singularities.ring_vortex import induced_velocity_ring_vortex
 from fluidity.singularities.utils import smoothed_inv
 from fluidity.types import vec3
 import pyvista as pv
