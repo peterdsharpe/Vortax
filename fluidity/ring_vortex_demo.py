@@ -118,11 +118,6 @@ def lhs(vortex_strengths: Float[Array, "n_faces"]) -> Float[Array, "n_faces"]:
         ]
     )
 
-
-linear_op = lineax.FunctionLinearOperator(
-    fn=lhs,
-    input_structure=jnp.empty((mesh.n_faces,)),
-)
 rhs = jnp.concatenate(
     [
         jnp.einsum("j,ij->i", -freestream, face_normals),
@@ -131,11 +126,26 @@ rhs = jnp.concatenate(
     ]
 )
 
-solve = eqx.filter_jit(lineax.linear_solve)
-
 print("Solving...")
 
-solution = solve(
+# import optimistix
+# solution = eqx.filter_jit(optimistix.least_squares)(
+#     fn=lambda y, args: jnp.concatenate([
+#         lhs(y) - rhs, 
+#         y
+#         ]),
+#     y0=jnp.zeros(mesh.n_faces),
+#     solver=optimistix.BestSoFarLeastSquares(optimistix.GaussNewton(
+#         rtol=0.1, atol=0.1,
+#         verbose=frozenset({"loss", "step_size"})
+#     )),
+# )
+
+linear_op = lineax.FunctionLinearOperator(
+    fn=lhs,
+    input_structure=jnp.empty(mesh.n_faces),
+)
+solution = eqx.filter_jit(lineax.linear_solve)(
     operator=linear_op,
     vector=rhs,
     # solver=lineax.AutoLinearSolver(well_posed=False)
@@ -143,10 +153,9 @@ solution = solve(
     # solver=lineax.GMRES(
     #     rtol=1e-4,
     #     atol=1e-4,
-    #     restart=50,
-    #     stagnation_iters=100,
     # ),
 )
+
 vortex_strengths = solution.value
 
 print(f"Velocity MAE error: {np.mean(np.abs(lhs(vortex_strengths) - rhs))}")
