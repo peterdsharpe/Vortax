@@ -235,4 +235,5 @@ pl_mesh.show()
 
 # Visualize the distribution of vortex strengths
 from fluidity.postprocessing.plot_symlog import plot_symlog_distribution
+
 plot_symlog_distribution(vortex_strengths, show=True)

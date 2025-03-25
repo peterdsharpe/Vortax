@@ -125,6 +125,7 @@ if __name__ == "__main__":
         meshes[name] = submesh
 
     import trimesh
+
     meshes = {
         k: trimesh.Trimesh(submesh.points, submesh.regular_faces)
         for k, submesh in meshes.items()

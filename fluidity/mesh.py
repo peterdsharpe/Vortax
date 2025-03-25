@@ -96,5 +96,7 @@ if __name__ == "__main__":
 
     res = mesh.get_induced_velocity_components_ring_vortices(jnp.array([0.0, 0.0, 0.0]))
     print(res)
-    res = mesh.get_induced_velocity_components_ring_vortices(jnp.array([0.0, 0.0, 0.0]), dotted_with=jnp.array([1.0, 0.0, 0.0]))
+    res = mesh.get_induced_velocity_components_ring_vortices(
+        jnp.array([0.0, 0.0, 0.0]), dotted_with=jnp.array([1.0, 0.0, 0.0])
+    )
     print(res)
