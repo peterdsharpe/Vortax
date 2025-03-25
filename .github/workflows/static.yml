@@ -36,7 +36,12 @@ jobs:
       - name: Setup Git LFS
         run: |
           git lfs install
+          git config lfs.fetchexclude ""
+          git lfs fetch --all
           git lfs pull
+          git lfs checkout
+          # Force checkout of LFS files
+          find . -type f -name "*.html" -exec git checkout -- {} \;
       - name: List files
         run: |
           ls -la ./docs/site/
