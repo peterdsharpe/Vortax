@@ -68,9 +68,8 @@ def induced_velocity_ring_vortex(
     Returns:
         Induced velocity vector at query point
     """
-    n_ring_points = ring_points.shape[
-        0
-    ]  # Dynamically get the number of points from the jaxtyping annotation
+    # Dynamically get the number of points from the jaxtyping annotation
+    n_ring_points = ring_points.shape[0]
 
     # Vectorized computation for all segments
     def compute_segment_velocity(i):
