@@ -35,10 +35,6 @@ jobs:
           lfs: true
       - name: Setup Git LFS
         run: |
-          git lfs install
-          git lfs checkout
-          git config lfs.fetchexclude ""
-          git lfs fetch --all
           git lfs pull
       - name: List files
         run: |
