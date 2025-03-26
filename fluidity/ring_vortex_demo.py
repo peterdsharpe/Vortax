@@ -118,6 +118,7 @@ def lhs(vortex_strengths: Float[Array, "n_faces"]) -> Float[Array, "n_faces"]:
         ]
     )
 
+
 rhs = jnp.concatenate(
     [
         jnp.einsum("j,ij->i", -freestream, face_normals),
@@ -131,7 +132,7 @@ print("Solving...")
 # import optimistix
 # solution = eqx.filter_jit(optimistix.least_squares)(
 #     fn=lambda y, args: jnp.concatenate([
-#         lhs(y) - rhs, 
+#         lhs(y) - rhs,
 #         y
 #         ]),
 #     y0=jnp.zeros(mesh.n_faces),
@@ -233,7 +234,8 @@ opacities = (intensity - min_score) / (max_score - min_score)
 pl_mesh = pv.Plotter()
 pl_mesh.add_mesh(
     mesh.to_pyvista(),
-    scalars=vortex_strengths, label="Vortex strengths",
+    scalars=vortex_strengths,
+    label="Vortex strengths",
     cmap="RdBu",
     clim=np.array([-1, 1]) * np.max(np.abs(np.percentile(vortex_strengths, (5, 95)))),
     opacity=opacities,
