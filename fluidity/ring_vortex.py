@@ -4,7 +4,6 @@ from jaxtyping import Float, Array, Int
 from fluidity.singularities.utils import smoothed_inv
 from fluidity.types import vec3
 import jax.numpy as jnp
-import equinox as eqx
 
 
 def get_induced_velocity_ring_vortex(

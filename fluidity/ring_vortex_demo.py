@@ -12,6 +12,7 @@ from fluidity.ring_vortex import (
     get_induced_velocity_mesh_ring_vortices,
     get_induced_velocity_ring_vortex,
 )
+from fluidity.postprocessing.plot_symlog import plot_symlog_distribution
 
 pv.set_jupyter_backend("client")
 
@@ -245,6 +246,5 @@ pl_mesh.show_bounds()
 pl_mesh.show()
 
 # Visualize the distribution of vortex strengths
-from fluidity.postprocessing.plot_symlog import plot_symlog_distribution
 
 plot_symlog_distribution(vortex_strengths, show=True)

@@ -1,10 +1,7 @@
-from functools import lru_cache
 import equinox as eqx
-import jax
 import jax.numpy as jnp
 import numpy as np
 from jaxtyping import Float, Int, Array
-from fluidity.singularities.utils import smoothed_inv
 from fluidity.types import vec3
 import pyvista as pv
 import trimesh

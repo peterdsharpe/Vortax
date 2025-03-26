@@ -1,5 +1,3 @@
-import jax.numpy as jnp
-import jaxtyping
 
 
 def smoothed_inv(x: float, radius: float) -> float:

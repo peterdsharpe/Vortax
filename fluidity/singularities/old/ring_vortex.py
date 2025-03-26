@@ -1,7 +1,7 @@
 import numpy as np
 import jax
 import jax.numpy as jnp
-from jaxtyping import Array, Float
+from jaxtyping import Float
 from fluidity.types import vec3
 from fluidity.singularities.utils import smoothed_inv
 
@@ -99,7 +99,7 @@ if __name__ == "__main__":
 
     print("Test case 1: Point above horizontal filament")
     print(f"{np.array(velocity) = }")
-    print(f"Expected direction: negative y-axis")
+    print("Expected direction: negative y-axis")
 
     # Test case 2: Point further away should have smaller velocity magnitude
     query_point_far = jnp.array([0.5, 0.0, 2.0])
