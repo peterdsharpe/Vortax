@@ -233,7 +233,7 @@ opacities = (intensity - min_score) / (max_score - min_score)
 pl_mesh = pv.Plotter()
 pl_mesh.add_mesh(
     mesh.to_pyvista(),
-    scalars=vortex_strengths,
+    scalars=vortex_strengths, label="Vortex strengths",
     cmap="RdBu",
     clim=np.array([-1, 1]) * np.max(np.abs(np.percentile(vortex_strengths, (5, 95)))),
     opacity=opacities,
