@@ -35,7 +35,7 @@ jobs:
           lfs: true
       - name: Setup Git LFS
         run: |
-          git lfs pull
+          git lfs pull --include="docs/site/*.html"
       - name: List files
         run: |
           ls -la ./docs/site/
