@@ -21,3 +21,7 @@ dev = [
 
 [tool.uv.sources]
 fluidity = { workspace = true }
+
+[tool.ruff]
+ignore = ["F722"]  # Recommended by jaxtyping
+

@@ -54,7 +54,7 @@ def induced_velocity_vortex_filament(
 @jax.jit
 def induced_velocity_ring_vortex(
     query_point: vec3,
-    ring_points: Float[vec3, "ring_points"],
+    ring_points: Float[vec3, " ring_points"],
     radius: float = eps,
 ) -> vec3:
     """

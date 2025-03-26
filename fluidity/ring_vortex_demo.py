@@ -60,7 +60,7 @@ face_areas = mesh.face_areas
 
 
 @eqx.filter_jit
-def compute_self_induced_velocities() -> Float[Array, "n_faces"]:
+def compute_self_induced_velocities() -> Float[Array, " n_faces"]:
     def compute_self_induced_velocity(i: int) -> float:
         return 1 / get_induced_velocity_ring_vortex(
             ring_points=mesh.vertices[mesh.faces[i]],
@@ -68,7 +68,7 @@ def compute_self_induced_velocities() -> Float[Array, "n_faces"]:
             dotted_with=face_normals[i],
         )
 
-    self_induced_velocities: Float[Array, "n_faces"] = jax.vmap(
+    self_induced_velocities: Float[Array, " n_faces"] = jax.vmap(
         compute_self_induced_velocity
     )(jnp.arange(mesh.n_faces))
     return self_induced_velocities
@@ -78,7 +78,7 @@ self_induced_velocities = compute_self_induced_velocities()
 
 
 @eqx.filter_jit
-def lhs(vortex_strengths: Float[Array, "n_faces"]) -> Float[Array, "n_faces"]:
+def lhs(vortex_strengths: Float[Array, " n_faces"]) -> Float[Array, " n_faces"]:
     def compute_face_induced_normal_velocity(i: int) -> float:
         return jnp.sum(
             get_induced_velocity_mesh_ring_vortices(
@@ -90,7 +90,7 @@ def lhs(vortex_strengths: Float[Array, "n_faces"]) -> Float[Array, "n_faces"]:
             )
         )
 
-    face_induced_normal_velocities: Float[Array, "n_faces"] = jax.lax.map(
+    face_induced_normal_velocities: Float[Array, " n_faces"] = jax.lax.map(
         f=compute_face_induced_normal_velocity,
         xs=jnp.arange(mesh.n_faces),
         batch_size=64,  # Limits memory usage
