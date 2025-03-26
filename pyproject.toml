@@ -23,5 +23,5 @@ dev = [
 fluidity = { workspace = true }
 
 [tool.ruff]
-ignore = ["F722"]  # Recommended by jaxtyping
+lint.ignore = ["F722"]  # Recommended by jaxtyping
 
