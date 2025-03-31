@@ -167,12 +167,13 @@ class IndexedTree:
 
     @property
     def all_points(self) -> Float[Array, "n_points_tree n_dim"]:
-        if self._all_points is not None:
-            return self._all_points
-        elif not self.is_root:
-            return self.parent.all_points
+        if not self.is_root:  # If this is a child node, get the points from the parent
+            try:
+                return self.parent.all_points
+            except AttributeError:  # Parent is None, so we are the root
+                raise ValueError("Root node has no points.")
         else:
-            raise ValueError("Root node has no points.")
+            return self._all_points
 
     @property
     def n_dim(self) -> int:
@@ -193,11 +194,11 @@ class IndexedTree:
     def bounds_max(self) -> Float[Array, " n_dim"]:
         return self.center + self.size / 2
 
-    @property
+    @cached_property
     def is_leaf(self) -> bool:
         return self.children is None
 
-    @property
+    @cached_property
     def is_root(self) -> bool:
         return self.parent is None
 
@@ -208,7 +209,7 @@ class IndexedTree:
         else:
             return self.parent.depth + 1
 
-    @property
+    @cached_property
     def n_points(self) -> int:
         return len(self.indices)
 
@@ -241,7 +242,7 @@ class IndexedTree:
             A new IndexedTree instance representing the spatial decomposition
         """
         # Forces a NumPy cast, since this is much faster in NumPy than in JAX due to branching logic
-        all_points = np.asarray(all_points)
+        # all_points = np.asarray(all_points)
 
         # Determine if this is the base case (root node) or a recursive case (child node)
         inputs_required_for_children = [_indices, _center, _size, _parent]
@@ -258,7 +259,9 @@ class IndexedTree:
             n_points_total = all_points.shape[0]
             _indices = np.arange(n_points_total)
 
-            mins, maxs = np.quantile(all_points, q=np.array([0.0, 1.0]), axis=0)
+            
+            mins = np.min(all_points, axis=0)
+            maxs = np.max(all_points, axis=0)
             _center = (mins + maxs) / 2
             axis_sizes = maxs - mins
             _size = np.max(axis_sizes)
@@ -274,39 +277,51 @@ class IndexedTree:
             parent=_parent,
             children=None,
         )
-
         ### Now, fill in the children, if needed
         if node.n_points > 1:
             node_points = node.all_points[_indices]
             n_dim = node_points.shape[1]
-            node.children: dict[tuple[bool, ...], "IndexedTree"] = {}
-
-            for octant_index in itertools.product([False, True], repeat=n_dim):
-
-                to_keep = np.ones_like(_indices, dtype=bool)
-                for i, use_upper in enumerate(octant_index):
-                    if use_upper:
-                        to_keep = to_keep & (node_points[:, i] >= node.center[i])
-                    else:
-                        to_keep = to_keep & (node_points[:, i] < node.center[i])
-
-                child_indices = _indices[to_keep]
-
-                child_center = node.center + _size / 4 * np.array(
-                    [
-                        1.0 if use_upper else -1.0
-                        for i, use_upper in enumerate(octant_index)
-                    ]
-                )
-
-                node.children[octant_index] = cls.from_points(
-                    all_points=None,
-                    _indices=child_indices,
-                    _center=child_center,
-                    _size=_size / 2,
-                    _parent=node,
-                    # jax=jax,
-                )
+            children: dict[tuple[bool, ...], "IndexedTree"] = {}
+            
+            # Precompute boolean arrays for each dimension as a 2D array
+            # Shape: (n_points, n_dim)
+            is_upper_half = node_points >= node.center
+            
+            # Generate all possible octants
+            octants = list(itertools.product([False, True], repeat=n_dim))
+            
+            # Precompute child centers for all octants
+            directions = np.array([[1.0 if use_upper else -1.0 for use_upper in octant] 
+                                  for octant in octants])
+            child_centers = node.center + _size / 4 * directions
+            
+            # Pre-allocate the boolean mask array to avoid recreating it in the loop
+            mask = np.zeros((len(_indices), len(octants)), dtype=bool)
+            mask[:] = True  # Start with all True
+            
+            # Vectorized computation of masks for all octants at once
+            for dim in range(n_dim):
+                for oct_idx, octant in enumerate(octants):
+                    if octant[dim]:  # Upper half
+                        mask[:, oct_idx] &= is_upper_half[:, dim]
+                    else:  # Lower half
+                        mask[:, oct_idx] &= ~is_upper_half[:, dim]
+            
+            # Create children for each octant
+            for idx, octant_index in enumerate(octants):
+                child_indices = _indices[mask[:, idx]]
+                
+                # Only create children for non-empty octants
+                if len(child_indices) > 0:
+                    children[octant_index] = cls.from_points(
+                        all_points=None,
+                        _indices=child_indices,
+                        _center=child_centers[idx],
+                        _size=_size / 2,
+                        _parent=node,
+                    )
+        
+            node.children = children
 
         return node
 
@@ -314,5 +329,8 @@ class IndexedTree:
 if __name__ == "__main__":
     points = np.random.randn(100000, 3)
     points /= np.linalg.norm(points, axis=1, keepdims=True)  # Projected onto unit sphere
-    node = IndexedTree.from_points(np.array(points))
+    node = IndexedTree.from_points(points)
+    # node = eqx.filter_jit(IndexedTree.from_points)(points)
     # print(node)
+    import pykdtree
+    tree = pykdtree.kdtree.KDTree(points)
