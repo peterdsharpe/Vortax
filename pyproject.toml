@@ -1,7 +1,7 @@
 [project]
 name = "vortax"
 version = "0.1.0"
-description = "Add your description here"
+description = "Differentiable and scalable 3D panel method aerodynamics, (optionally) on the GPU."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
