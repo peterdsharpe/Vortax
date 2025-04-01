@@ -376,9 +376,9 @@ class IndexedTree:
         if plotter is None:
             plotter = pv.Plotter()
 
-        assert (
-            self.n_dim == 3
-        ), "Only 3D trees are supported for visualization with PyVista"
+        assert self.n_dim == 3, (
+            "Only 3D trees are supported for visualization with PyVista"
+        )
 
         # Generate a colormap with distinct colors
         import matplotlib

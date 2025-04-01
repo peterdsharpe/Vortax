@@ -1,5 +1,3 @@
-
-
 def smoothed_inv(x: float, radius: float) -> float:
     """
     Approximates 1/x with a function that smoothly approaches 0 as x approaches 0.
