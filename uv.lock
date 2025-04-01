@@ -167,7 +167,7 @@ wheels = [
 ]
 
 [[package]]
-name = "fluidity"
+name = "vortax"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
@@ -182,7 +182,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "fluidity" },
+    { name = "vortax" },
 ]
 
 [package.metadata]
@@ -197,7 +197,7 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-dev = [{ name = "fluidity", virtual = "." }]
+dev = [{ name = "vortax", virtual = "." }]
 
 [[package]]
 name = "fonttools"

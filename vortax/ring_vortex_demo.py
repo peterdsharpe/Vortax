@@ -1,18 +1,18 @@
 import numpy as np
-from fluidity.mesh import Mesh
+from vortax.mesh import Mesh
 import pyvista as pv
 import jax.numpy as jnp
 from jaxtyping import Float, Array
-from fluidity.types import vec3
+from vortax.types import vec3
 import jax
 import equinox as eqx
 import lineax
 from pathlib import Path
-from fluidity.ring_vortex import (
+from vortax.ring_vortex import (
     get_induced_velocity_mesh_ring_vortices,
     get_induced_velocity_ring_vortex,
 )
-from fluidity.postprocessing.plot_symlog import plot_symlog_distribution
+from vortax.postprocessing.plot_symlog import plot_symlog_distribution
 
 pv.set_jupyter_backend("client")
 
@@ -36,7 +36,7 @@ mesh_pv = mesh_pv.clean(tolerance=smallest_face_scale)
 #     flip_normals=True,
 # )
 
-# Convert to Fluidity mesh
+# Convert to vortax mesh
 mesh = Mesh(
     vertices=jnp.array(mesh_pv.points),
     faces=jnp.array(mesh_pv.regular_faces),

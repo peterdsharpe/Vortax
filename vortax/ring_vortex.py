@@ -1,8 +1,8 @@
 import jax
-from fluidity.mesh import Mesh
+from vortax.mesh import Mesh
 from jaxtyping import Float, Array, Int
-from fluidity.singularities.utils import smoothed_inv
-from fluidity.types import vec3
+from vortax.singularities.utils import smoothed_inv
+from vortax.types import vec3
 import jax.numpy as jnp
 
 

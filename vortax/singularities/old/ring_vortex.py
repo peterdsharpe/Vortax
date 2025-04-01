@@ -2,8 +2,8 @@ import numpy as np
 import jax
 import jax.numpy as jnp
 from jaxtyping import Float
-from fluidity.types import vec3
-from fluidity.singularities.utils import smoothed_inv
+from vortax.types import vec3
+from vortax.singularities.utils import smoothed_inv
 
 eps = 1e-8
 

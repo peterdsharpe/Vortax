@@ -1,5 +1,5 @@
 [project]
-name = "fluidity"
+name = "vortax"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -16,11 +16,11 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "fluidity",
+    "vortax",
 ]
 
 [tool.uv.sources]
-fluidity = { workspace = true }
+vortax = { workspace = true }
 
 [tool.ruff]
 lint.ignore = ["F722"]  # Recommended by jaxtyping

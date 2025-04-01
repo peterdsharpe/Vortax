@@ -2,7 +2,7 @@ import equinox as eqx
 import jax.numpy as jnp
 import numpy as np
 from jaxtyping import Float, Int, Array
-from fluidity.types import vec3
+from vortax.types import vec3
 import pyvista as pv
 import trimesh
 
