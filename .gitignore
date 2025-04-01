@@ -16,3 +16,6 @@ wheels/
 
 # Virtual environments
 .venv*
+
+# IDEA
+*.idea
