@@ -14,14 +14,23 @@ dependencies = [
     "pyvista>=0.44.2",
 ]
 
-[dependency-groups]
+[project.optional-dependencies]
 dev = [
-    "vortax",
+    "jax[cuda12]>=0.5.3",
+    "ipython>=8.34.0",
+    "ipykernel>=6.29.5",
+    "pyvista[all]>=0.44.2",
+    "ipywidgets>=8.1.5",
+    "pyacvd>=0.2.9",
+    "trimesh>=3.20.0",
 ]
 
-[tool.uv.sources]
-vortax = { workspace = true }
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["vortax"]
 
 [tool.ruff]
 lint.ignore = ["F722"]  # Recommended by jaxtyping
-
