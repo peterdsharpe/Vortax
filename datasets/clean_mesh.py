@@ -9,10 +9,26 @@ def basic_cleaning(mesh: pv.PolyData, tolerance: float = 1e-6) -> pv.PolyData:
     # Removes duplicate vertices
     mesh = mesh.clean(tolerance=tolerance)
 
+    # Ensure all faces are triangles
+    if not mesh.is_all_triangles:
+        mesh = mesh.triangulate()
+
     # Removes duplicate faces
     if mesh.n_cells > 0:
+        faces = mesh.regular_faces
+        faces_to_keep = np.zeros(len(faces), dtype=bool)
+
+        # Here, we remove any faces that are exactly duplicates of another face
+        sorted_faces = np.sort(faces, axis=1)
+        _, nonduplicate_indices = np.unique(sorted_faces, axis=0, return_index=True)
+        faces_to_keep[nonduplicate_indices] = True
+        
+        # If any faces have non-unique vertices (i.e., not a true triangle), we need to remove them
+        has_unique_vertices = np.all(sorted_faces[:, 1:] - sorted_faces[:, :-1] != 0, axis=1)
+        faces_to_keep = np.logical_and(faces_to_keep, has_unique_vertices)
+
         mesh = pv.PolyData.from_regular_faces(
-            mesh.points, np.unique(np.sort(mesh.regular_faces, axis=1), axis=0)
+            mesh.points, faces[faces_to_keep]
         )
         mesh = mesh.compute_normals(
             point_normals=False,
@@ -20,6 +36,16 @@ def basic_cleaning(mesh: pv.PolyData, tolerance: float = 1e-6) -> pv.PolyData:
             flip_normals=True,  # Point normals outwards
         )
     return mesh
+
+
+def remesh(mesh: pv.PolyData, n_verts: int, n_subdivisions: int = 0) -> pv.PolyData:
+    import pyacvd
+
+    clus = pyacvd.Clustering(mesh)
+    if n_subdivisions > 0:
+        clus.subdivide(n_subdivisions)
+    clus.cluster(n_verts)
+    return clus.create_mesh()
 
 
 def process_mesh(mesh: pv.PolyData, n_verts: int = 5000) -> pv.PolyData:
@@ -36,20 +62,14 @@ def process_mesh(mesh: pv.PolyData, n_verts: int = 5000) -> pv.PolyData:
     # v, f = tin.return_arrays()
     # mesh = pv.PolyData.from_regular_faces(v, f)
 
-    import pyacvd
-
-    clus = pyacvd.Clustering(mesh)
-    clus.subdivide(1)
-    clus.cluster(n_verts)
-    mesh = clus.create_mesh()
-
+    mesh = remesh(mesh, n_verts, n_subdivisions=0)
     mesh = basic_cleaning(mesh)
     return mesh
 
 
 def process_mesh_file(
     mesh_path: Path,
-    output_path: Path = None,
+    output_path: Path | None = None,
     n_verts: int = 5000,
 ):
     if output_path is None:
@@ -57,7 +77,8 @@ def process_mesh_file(
             ".stl"
         )
 
-    mesh = process_mesh(mesh_path, n_verts)
+    mesh = pv.read(mesh_path)
+    mesh = process_mesh(mesh, n_verts)
     mesh.save(output_path)
     return mesh
 
@@ -85,9 +106,9 @@ def get_groupid(mesh: pv.PolyData, idx: int | slice) -> pv.PolyData:
 if __name__ == "__main__":
     pwd = Path(__file__).parent
 
-    # mesh = process_mesh_file(pwd / "drivaer_4.stl", n_verts=5000)
-    # print(mesh)
-    # mesh.plot(color="w", show_edges=True)
+    mesh = process_mesh_file(pwd / "drivaer_4.stl", n_verts=5000)
+    print(mesh)
+    mesh.plot(color="w", show_edges=True)
 
     # mesh = pv.read(pwd / "motorbike.obj")
     # mesh = process_mesh(mesh)
@@ -124,20 +145,20 @@ if __name__ == "__main__":
 
         meshes[name] = submesh
 
-    import trimesh
+    # import trimesh
 
-    meshes = {
-        k: trimesh.Trimesh(submesh.points, submesh.regular_faces)
-        for k, submesh in meshes.items()
-    }
-    for k, mesh in meshes.items():
-        trimesh.fix_normals(mesh)
-        trimesh.repair.fill_holes(mesh)
-        trimesh.repair.fix_winding(mesh)
+    # meshes = {
+    #     k: trimesh.Trimesh(submesh.points, submesh.regular_faces)
+    #     for k, submesh in meshes.items()
+    # }
+    # for k, mesh in meshes.items():
+    #     trimesh.repair.fix_normals(mesh)
+    #     trimesh.repair.fill_holes(mesh)
+    #     trimesh.repair.fix_winding(mesh)
     mesh = pv.merge(list(meshes.values()))
     # mesh.plot(scalars="GroupIds", cmap="gist_ncar", annotations={
     #     k: f"{k}" for k in range(0, len(meshes), 5)
     # })
-    mesh = process_mesh(mesh, n_verts=8000)
+    mesh = process_mesh(mesh, n_verts=9000)
     mesh.plot(color="w", show_edges=True)
     mesh.save(pwd / "motorbike_cleaned.stl")
