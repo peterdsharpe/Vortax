@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import Any, Optional
 from functools import cached_property, partial
 from vortax.types import vec3
+import pyvista as pv
 
 import numpy as np
 
@@ -170,8 +171,8 @@ class IndexedTree:
 
         return "\n".join(lines)
 
-    @cached_property
-    def points(self) -> Float[Array, "n_points_tree n_dim"]:
+    @property
+    def points(self) -> Float[Array, "n_points n_dim"]:
         return self.all_points[self.indices]
 
     @property
@@ -203,11 +204,11 @@ class IndexedTree:
     def bounds_max(self) -> Float[Array, " n_dim"]:
         return self.center + self.size / 2
 
-    @cached_property
+    @property
     def is_leaf(self) -> bool:
         return self.children is None
 
-    @cached_property
+    @property
     def is_root(self) -> bool:
         return self.parent is None
 
@@ -218,7 +219,7 @@ class IndexedTree:
         else:
             return self.parent.depth + 1
 
-    @cached_property
+    @property
     def n_points(self) -> int:
         return len(self.indices)
 
@@ -242,6 +243,7 @@ class IndexedTree:
         _size: None | Float[Array, " n_dim"] = None,
         _parent: Optional["IndexedTree"] = None,
         validate: bool = False,
+        max_points_per_leaf: int = 1,
     ) -> "IndexedTree":
         """
         Create a node from a set of points by recursively subdividing space.
@@ -292,9 +294,12 @@ class IndexedTree:
 
             _parent = None
 
+        else:
+            all_points = None
+
         ### Now, build the node
         node = cls(
-            _all_points=None,  # Will be filled in below
+            _all_points=all_points,
             indices=_indices,
             center=_center,
             size=_size,
@@ -302,11 +307,8 @@ class IndexedTree:
             children=None,  # Will be filled in below
         )
 
-        if is_root:  # Performs this separately (rather than ternary) for speed
-            node.__dict__["_all_points"] = all_points
-
         ### Now, fill in the children, if needed
-        if len(_indices) > 1:
+        if len(_indices) > max_points_per_leaf:
             children: dict[tuple[bool, ...], "IndexedTree"] = {}
 
             # Precompute boolean arrays for each dimension as a 2D array
@@ -358,8 +360,11 @@ class IndexedTree:
                         _parent=node,
                     )
 
-            # node.children = children
             node.__dict__["children"] = children
+            # Note: this modification above is in fact modifying a frozen dataclass - it's done here because:
+            # a) it's required to form the bidirectional linkages in the tree structure, and
+            # b) we can guarantee that no outside modifications or cache generations to @cached_properties have been done, since
+            #    the node is freshly created in this scope.
 
         return node
 
@@ -368,11 +373,9 @@ class IndexedTree:
         draw_points: bool = True,
         draw_bounds: bool = True,
         depth_limit: int = None,
-        plotter: "pv.Plotter" = None,
+        plotter: pv.Plotter | None = None,
         show: bool = True,
-    ) -> "pv.Plotter":
-        import pyvista as pv
-
+    ) -> pv.Plotter:
         if plotter is None:
             plotter = pv.Plotter()
 
@@ -456,7 +459,7 @@ class IndexedTree:
 
 
 if __name__ == "__main__":
-    points = np.random.randn(100, 3)
+    points = np.random.randn(500, 3)
     points /= np.linalg.norm(
         points, axis=1, keepdims=True
     )  # Projected onto unit sphere
@@ -467,7 +470,7 @@ if __name__ == "__main__":
     end_time = time.time()
     print(f"Tree construction time: {end_time - start_time:.4f} seconds")
 
-    node.draw_pyvista(show=True)
+    node.draw_pyvista(depth_limit=3)
 
     leaves, treedef = jax.tree.flatten(
         node, is_leaf=lambda x: isinstance(x, IndexedTree) and x.is_leaf
