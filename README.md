@@ -1,4 +1,4 @@
-# Vortax
+# :tornado: Vortax :tornado:
 
 > NOTE: this library is a heavy work in progress - expect breaking changes.
 
