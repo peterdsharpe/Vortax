@@ -22,14 +22,14 @@ def basic_cleaning(mesh: pv.PolyData, tolerance: float = 1e-6) -> pv.PolyData:
         sorted_faces = np.sort(faces, axis=1)
         _, nonduplicate_indices = np.unique(sorted_faces, axis=0, return_index=True)
         faces_to_keep[nonduplicate_indices] = True
-        
+
         # If any faces have non-unique vertices (i.e., not a true triangle), we need to remove them
-        has_unique_vertices = np.all(sorted_faces[:, 1:] - sorted_faces[:, :-1] != 0, axis=1)
+        has_unique_vertices = np.all(
+            sorted_faces[:, 1:] - sorted_faces[:, :-1] != 0, axis=1
+        )
         faces_to_keep = np.logical_and(faces_to_keep, has_unique_vertices)
 
-        mesh = pv.PolyData.from_regular_faces(
-            mesh.points, faces[faces_to_keep]
-        )
+        mesh = pv.PolyData.from_regular_faces(mesh.points, faces[faces_to_keep])
         mesh = mesh.compute_normals(
             point_normals=False,
             auto_orient_normals=True,
