@@ -1,11 +1,12 @@
 import itertools
+from pathlib import Path
 import equinox as eqx
 import jax
 import jax.numpy as jnp
 from jaxtyping import Float, Array, Int
 from dataclasses import dataclass
 from typing import Any, Optional
-from functools import cached_property, partial
+from functools import cached_property, lru_cache, partial
 from vortax.types import vec3
 import pyvista as pv
 
@@ -358,6 +359,8 @@ class IndexedTree:
                         _center=child_centers[idx],
                         _size=_size / 2,
                         _parent=node,
+                        validate=validate,
+                        max_points_per_leaf=max_points_per_leaf,
                     )
 
             node.__dict__["children"] = children
@@ -386,24 +389,12 @@ class IndexedTree:
         # Generate a colormap with distinct colors
         import matplotlib
 
+        cmap = matplotlib.colormaps["Dark2"]
+
+        @lru_cache
         def _get_node_color(depth: int) -> tuple:
             """Generate a unique color for a node based on its ID."""
-            cmap = matplotlib.colormaps["Dark2"]
-            # return cmap(node_id)[:3]  # RGB values only
             return cmap(depth)[:3]  # RGB values only
-
-        # Count total nodes to determine color distribution
-        def _count_nodes(node, depth=0, current_depth=0):
-            if node.is_leaf or (
-                depth_limit is not None and current_depth >= depth_limit
-            ):
-                return 1
-            return 1 + sum(
-                _count_nodes(child, depth, current_depth + 1)
-                for child in node.children.values()
-            )
-
-        total_nodes = _count_nodes(self, depth_limit)
 
         # Recursively draw the tree
         def _draw_node(node, node_id=0, depth=0):
@@ -459,18 +450,25 @@ class IndexedTree:
 
 
 if __name__ == "__main__":
-    points = np.random.randn(500, 3)
-    points /= np.linalg.norm(
-        points, axis=1, keepdims=True
-    )  # Projected onto unit sphere
+    # points = np.random.randn(500, 3)
+    # points /= np.linalg.norm(
+    #     points, axis=1, keepdims=True
+    # )  # Projected onto unit sphere
+    import vortax
+
+    mesh_pv = pv.read(
+        Path(vortax.__path__[0]).parent / "datasets" / "motorbike_cleaned.stl"
+    )
+    points = np.asarray(mesh_pv.points)
+
     import time
 
     start_time = time.time()
-    node = IndexedTree.from_points(points)
+    node = IndexedTree.from_points(points, max_points_per_leaf=100)
     end_time = time.time()
     print(f"Tree construction time: {end_time - start_time:.4f} seconds")
 
-    node.draw_pyvista(depth_limit=3)
+    node.draw_pyvista(depth_limit=5)
 
     leaves, treedef = jax.tree.flatten(
         node, is_leaf=lambda x: isinstance(x, IndexedTree) and x.is_leaf
