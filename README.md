@@ -1,15 +1,15 @@
-# :tornado: Vortax :tornado:
+<h1 align='center'>Vortax 🌬️🌪️🍃</h1>
 
-> NOTE: this library is a heavy work in progress - expect breaking changes.
+> **NOTE: this library is currently a heavy work in progress - expect breaking changes.**
 
-Vortax is a small self-contained JAX-based 3D potential flow solver.
+Vortax is a [JAX](https://github.com/google/jax) library for boundary-element representations of flowfields for fluid dynamics problems, where kernels may be potential flow singularities or otherwise.
 
-## Features
+Features:
 
-- **Hardware-accelerated**: Leverages JAX to run parts of the solve (e.g., kernel computations, linear solves) on GPUs.
+- **Hardware-accelerated**: Leverages JAX to run parts of the solve (e.g., kernel computations, linear- and least-squares solves) on GPUs.
 - **Scalable**: Uses matrix-free methods and hierarchical spatial decompositions to improve runtime for large problems. (WIP)
-- **Differentiable**: Differentiable with respect to a) geometry, b) freestream conditions, and c) singularity kernel functions.
-- **Mesh-compatible**: Takes raw triangulated surface meshes (e.g., STL files) as input, allowing easy application to complex geometries.
+- **Differentiable**: Differentiable with respect to a) geometry, b) freestream conditions, and c) kernel functions.
+- **Mesh-compatible**: Takes raw unstructured triangulated surface meshes (e.g., STL files) as input, allowing easy application to complex geometries.
 
 ## Gallery
 
@@ -23,16 +23,12 @@ Octree decomposition for hierarchical acceleration:
 
 ## Installation
 
-This is a platform-agnostic installation:
+This is a platform-agnostic source installation, requiring Python 3.10+:
 
-```
+```bash
 git clone git@github.com:peterdsharpe/Vortax.git
 cd Vortax
 pip install -e .
 ```
 
-By default, this will pull the CPU-only version of `jax` and `jaxlib`, which is compatible with Linux/MacOS/WSL/Windows. To use GPU acceleration, you'll want to first [install `jax` and `jaxlib` with GPU support](https://docs.jax.dev/en/latest/installation.html). On Linux/MacOS/WSL, you can typically do this with the following, assuming you have CUDA 12 installed (`nvidia-smi` to check):
-
-```
-pip install -U "jax[cuda12]"
-```
+By default, this will pull the CPU-only version of `jax` and `jaxlib`, which is compatible with Linux/MacOS/WSL/Windows. To use a GPU, [install `jax` and `jaxlib` with GPU support](https://docs.jax.dev/en/latest/installation.html). On Linux/MacOS/WSL, you can do this with `pip install -U "jax[cuda12]"`, assuming you have CUDA 12 installed (`nvidia-smi` to check).
