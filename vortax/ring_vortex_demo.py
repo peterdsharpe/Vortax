@@ -87,7 +87,7 @@ def lhs(vortex_strengths: Float[Array, " n_faces"]) -> Float[Array, " n_faces"]:
                 query_point=face_centers[i],
                 dotted_with=face_normals[i],
                 vortex_strengths=vortex_strengths * self_induced_velocities,
-                radius=1e-2 * smallest_face_scale,
+                radius=1e-3 * smallest_face_scale,
             )
         )
 
