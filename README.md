@@ -23,11 +23,9 @@ Octree decomposition for hierarchical acceleration:
 
 ## Installation
 
-This is a platform-agnostic source installation, requiring Python 3.10+:
+For a platform-agnostic source installation, requiring Python 3.10+:
 
 ```bash
-git clone git@github.com:peterdsharpe/Vortax.git
-cd Vortax
 pip install -e .
 ```
 
