@@ -18,8 +18,8 @@ pv.set_jupyter_backend("client")
 
 freestream = jnp.array([1.0, 0.0, 0.0])
 
-# mesh_pv = pv.Sphere(center=(0.5, 0, 0.5), radius=0.5, direction=(1, 0, 0))
-mesh_pv = pv.read(Path(__file__).parent.parent / "datasets" / "motorbike_cleaned.stl")
+mesh_pv = pv.Sphere(center=(0.5, 0, 0.5), radius=0.5, direction=(1, 0, 0))
+# mesh_pv = pv.read(Path(__file__).parent.parent / "datasets" / "motorbike_cleaned.stl")
 # mesh_pv = pv.read(
 #     Path(__file__).parent.parent / "datasets" / "drivaer_4_cleaned.stl"
 # ).translate((0, 0, 0.318))
