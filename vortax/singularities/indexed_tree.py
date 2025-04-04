@@ -1,15 +1,11 @@
 import itertools
 from pathlib import Path
-import equinox as eqx
 import jax
-import jax.numpy as jnp
 from jaxtyping import Float, Array, Int
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Optional
 from functools import cached_property, lru_cache, partial
-from vortax.types import vec3
 import pyvista as pv
-
 import numpy as np
 
 
@@ -94,7 +90,7 @@ class IndexedTree:
         """
         try:
             return self.repr_recursive(max_depth=2)
-        except RecursionError as e:
+        except RecursionError:
             return f"{self.__class__.__name__}({self.n_points} pts, size={self.size:.6g}, center={self.center})"
 
     def repr_recursive(

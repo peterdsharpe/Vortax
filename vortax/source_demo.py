@@ -5,9 +5,8 @@ import jax.numpy as jnp
 from jaxtyping import Float, Array
 from vortax.types import vec3
 import jax
-import equinox as eqx
 import lineax
-from pathlib import Path
+import equinox as eqx
 from vortax.source import get_induced_velocity_source
 from vortax.postprocessing.plot_symlog import plot_symlog_distribution
 
@@ -113,39 +112,37 @@ rhs = jnp.concatenate(
 
 print("Solving...")
 
-import optimistix
+# solution = eqx.filter_jit(optimistix.least_squares)(
+#     fn=lambda y, args: jnp.concatenate(
+#         [
+#             lhs(y) - rhs,
+#             # y
+#         ]
+#     ),
+#     y0=jnp.zeros(mesh.n_faces),
+#     solver=optimistix.BestSoFarLeastSquares(
+#         optimistix.GaussNewton(
+#             rtol=0.1,
+#             atol=0.1,
+#             verbose=frozenset({"loss", "step_size"}),
+#         )
+#     ),
+# )
 
-solution = eqx.filter_jit(optimistix.least_squares)(
-    fn=lambda y, args: jnp.concatenate(
-        [
-            lhs(y) - rhs,
-            # y
-        ]
-    ),
-    y0=jnp.zeros(mesh.n_faces),
-    solver=optimistix.BestSoFarLeastSquares(
-        optimistix.GaussNewton(
-            rtol=0.1,
-            atol=0.1,
-            verbose=frozenset({"loss", "step_size"}),
-        )
-    ),
+linear_op = lineax.FunctionLinearOperator(
+    fn=lhs,
+    input_structure=jnp.empty(mesh.n_faces),
 )
-
-# linear_op = lineax.FunctionLinearOperator(
-#     fn=lhs,
-#     input_structure=jnp.empty(mesh.n_faces),
-# )
-# solution = eqx.filter_jit(lineax.linear_solve)(
-#     operator=linear_op,
-#     vector=rhs,
-#     solver=lineax.AutoLinearSolver(well_posed=False)
-#     # solver=lineax.SVD(),
-#     # solver=lineax.GMRES(
-#     #     rtol=1e-4,
-#     #     atol=1e-4,
-#     # ),
-# )
+solution = eqx.filter_jit(lineax.linear_solve)(
+    operator=linear_op,
+    vector=rhs,
+    solver=lineax.AutoLinearSolver(well_posed=False)
+    # solver=lineax.SVD(),
+    # solver=lineax.GMRES(
+    #     rtol=1e-4,
+    #     atol=1e-4,
+    # ),
+)
 
 source_strengths = solution.value
 

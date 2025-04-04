@@ -7,9 +7,9 @@ from vortax.types import vec3
 import jax
 import equinox as eqx
 import lineax
-from pathlib import Path
 from vortax.doublet import get_induced_velocity_doublet
 from vortax.postprocessing.plot_symlog import plot_symlog_distribution
+from vortax.ring_vortex import get_induced_velocity_mesh_ring_vortices
 
 pv.set_jupyter_backend("client")
 
@@ -181,10 +181,6 @@ print(f"Condition number: {eqx.filter_jit(jnp.linalg.cond)(linear_op.as_matrix()
 #     # Sum all contributions and add freestream
 #     return jnp.sum(induced_velocities, axis=0) + freestream
 
-from vortax.ring_vortex import (
-    get_induced_velocity_mesh_ring_vortices,
-    get_induced_velocity_ring_vortex,
-)
 
 
 @eqx.filter_jit

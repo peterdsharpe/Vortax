@@ -1,7 +1,5 @@
 import jax
 import numpy as np
-from vortax.mesh import Mesh
-from jaxtyping import Float, Array, Int
 from vortax.singularities.utils import smoothed_inv
 from vortax.types import vec3
 import jax.numpy as jnp
