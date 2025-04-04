@@ -2,7 +2,7 @@
 
 > **NOTE: this library is currently a heavy work in progress - expect breaking changes.**
 
-Vortax is a [JAX](https://github.com/google/jax) library for boundary-element representations of flowfields for fluid dynamics problems, where kernels may be potential flow singularities or otherwise.
+Vortax is a [JAX](https://github.com/jax-ml/jax) library for boundary-element representations of flowfields for fluid dynamics problems, where kernels may be potential flow singularities or otherwise.
 
 Features:
 
