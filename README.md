@@ -1,6 +1,6 @@
 <h1 align='center'>Vortax 🌬️🌪️🍃</h1>
 
-> **NOTE: this library is currently a heavy work in progress - expect breaking changes.**
+> **NOTE: this library is currently a heavy work in progress - expect breaking changes. Currently, this repo is in a state that may be of interest to aerodynamics researchers, but it's not yet packaged/versioned/tested with the intent of supporting end-users.**
 
 Vortax is a [JAX](https://github.com/jax-ml/jax) library for boundary-element representations of flowfields for fluid dynamics problems, where kernels may be potential flow singularities or otherwise.
 
